@@ -191,7 +191,7 @@ class Listener(threading.Thread):
 
         for keyword in self.keywords:
             for subtitle in subtitles:
-                if keyword in subtitle.content:
+                if keyword in subtitle.content.lower():
                     words.add(keyword)
 
         return list(words)
