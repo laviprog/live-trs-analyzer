@@ -5,22 +5,27 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
-from src.bot.handlers import MODELS
-from src.process_flow.listener import start_listen
+from src.model.requests import get_models
+from src.process_flow.listener import Listener
 
 router = Router()
 
-task: asyncio.Task | None = None
+listener: Listener | None = None
 
 
 class StartState(StatesGroup):
     flow = State()
-    key_words = State()
+    language = State()
+    keywords = State()
     model = State()
 
 
 @router.message(F.text == "Начать анализировать поток")
-async def start_trs(sender: types.Message, state: FSMContext):
+async def start_trs(sender: types.Message, state: FSMContext, is_admin: bool):
+    if not is_admin:
+        await sender.answer("К сожалению, у вас нет прав, чтобы начать анализировать поток!")
+        return
+
     await sender.answer("Введите поток:", reply_markup=ReplyKeyboardRemove())
     await state.set_state(StartState.flow)
 
@@ -30,19 +35,32 @@ async def process_flow(message: types.Message, state: FSMContext):
     flow = message.text.strip()
     await state.update_data(flow=flow)
 
+    await message.answer('Введите язык (en, ru, kk) или поставьте прочерк "-" (будет использован язык по умолчанию – en):')
+    await state.set_state(StartState.language)
+
+
+@router.message(StartState.language)
+async def process_language(message: types.Message, state: FSMContext):
+    language = message.text.strip()
+
+    if language == '-':
+        language = 'en'
+
+    await state.update_data(language=language)
+
     await message.answer("Введите ключевые слова через запятую:")
-    await state.set_state(StartState.key_words)
+    await state.set_state(StartState.keywords)
 
 
-@router.message(StartState.key_words)
+@router.message(StartState.keywords)
 async def process_key_words(message: types.Message, state: FSMContext):
-    key_words = message.text.strip()
-    await state.update_data(key_words=key_words)
+    keywords = message.text.strip().split(',')
+    await state.update_data(keywords=keywords)
 
     await message.answer(
         "Выберите модель для анализа:",
         reply_markup=ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text=model) for model in MODELS]],
+            keyboard=[[KeyboardButton(text=model) for model in await get_models()]],
             resize_keyboard=True,
         )
     )
@@ -51,15 +69,26 @@ async def process_key_words(message: types.Message, state: FSMContext):
 
 
 @router.message(StartState.model)
-async def process_key_words(message: types.Message, state: FSMContext):
+async def process_model(message: types.Message, state: FSMContext):
     model = message.text.strip()
-    await state.update_data(model=model)
 
     data = await state.get_data()
-    await message.answer(f"Поток: {data['flow']}, ключевые слова: {data['key_words']}, модель: {data['model']}")
-
-    global task
-    task = asyncio.create_task(start_listen(flow=data["flow"], key_words=data["key_words"], model=model))
+    await message.answer(
+        f"Поток: {data['flow']}\n"
+        f"Язык: {data['language']}\n"
+        f"Ключевые слова: {', '.join(data['keywords'])}\n"
+        f"Модель: {model}",
+        reply_markup=ReplyKeyboardRemove()
+    )
+    global listener
+    listener = Listener(
+        flow=data['flow'],
+        keywords=data['keywords'],
+        language=data['language'],
+        analyzer_model=model,
+        loop=asyncio.get_event_loop()
+    )
+    listener.start()
 
     await message.answer(
         "Анализ начался...",
@@ -67,6 +96,7 @@ async def process_key_words(message: types.Message, state: FSMContext):
             keyboard=[
                 [
                     KeyboardButton(text="Закончить анализ"),
+                    KeyboardButton(text="Каналы"),
                 ]
             ],
             resize_keyboard=True,
@@ -78,15 +108,15 @@ async def process_key_words(message: types.Message, state: FSMContext):
 
 @router.message(F.text == "Закончить анализ")
 async def end_trs(sender: types.Message):
-    global task
-    task.cancel()
-    try:
-        await task
-    except asyncio.CancelledError:
-        pass
+    await sender.answer("Завершаю анализ...")
+
+    global listener
+    listener.stop()
+    listener.join()
+    listener = None
 
     await sender.answer(
-        "Анализ завершен.",
+        "Анализ завершен!",
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[
                 [

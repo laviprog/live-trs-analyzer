@@ -33,3 +33,6 @@ class Channel(Model):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     user: Mapped["User"] = relationship(back_populates="channels")
+
+    def __repr__(self) -> str:
+        return f"<Channel {self.channel_id}, {self.title}, {self.user_id}>"

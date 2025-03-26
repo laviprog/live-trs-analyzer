@@ -1,11 +1,16 @@
-from src.bot import bot
+from aiogram.enums import ParseMode
+
 from src.database.repositories import ChannelRepository
 
 
-# this func will send the message to channels
-# TODO add the message to send as an argument
-async def send():
+async def send(message):
+    from src.bot import bot
+    from src.bot import logger
+
     channels = await ChannelRepository.get_channels()
+    logger.info(channels)
 
     for channel in channels:
-        await bot.send_message(channel.channel_id, "Hello, world!")
+        await bot.send_message(channel.channel_id, message)
+
+# TODO send video

@@ -7,8 +7,9 @@ from aiogram.fsm.storage.redis import RedisStorage
 from redis.asyncio import Redis
 
 from src.bot.handlers import register_handlers
+from src.bot.middleware import AuthMiddleware
 from src.config import settings
-from src.database import engine, create_tables
+from src.database import engine
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ async def start_bot():
         storage = RedisStorage(redis)
 
         dp = Dispatcher(storage=storage)
+        dp.update.middleware(AuthMiddleware())
 
         register_handlers(dp)
 

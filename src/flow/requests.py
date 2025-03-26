@@ -1,11 +1,10 @@
 import aiohttp
 
-from src.flow import URL_REQUEST
+from src.flow import REQUEST_URL
 
 
-# TODO change get_video_from_flow
 async def get_video_from_flow(start_time: int, end_time: int, save_path: str):
-    ENDPOINT = URL_REQUEST + f'?start_time={start_time}&end_time={end_time}'
+    ENDPOINT = REQUEST_URL + f'?start_time={start_time}&end_time={end_time}'
 
     headers = {
         'Content-Type': 'multipart/form-data'

@@ -4,7 +4,7 @@ import torchaudio
 from src.transcriber import logger, MODEL
 
 
-async def transcribe_audio(audio_bytes, language="en", batch_size=4, chunk_size=10):
+def transcribe_audio(audio_bytes, language="en", batch_size=4, chunk_size=10):
     try:
         audio, _ = torchaudio.load(io.BytesIO(audio_bytes))
     except Exception as e:

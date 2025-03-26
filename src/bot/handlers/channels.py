@@ -13,19 +13,28 @@ class ChannelState(StatesGroup):
 
 
 @router.message(F.text == "Каналы")
-async def get_channels(sender: types.Message):
+async def get_channels(sender: types.Message, is_admin: bool):
+    if not is_admin:
+        await sender.answer("К сожалению, у вас нет прав, чтобы получить список каналов!")
+        return
+
     channels = await ChannelRepository.get_channels_by_user(sender.from_user.id)
 
     if not channels:
         await sender.answer("У вас нет добавленных каналов.")
         return
 
+    await sender.answer("Список добавленных каналы:")
     for channel in channels:
         await sender.answer(f"Канал: {channel.title}")
 
 
 @router.message(F.text == "Добавить канал")
-async def add_channel(sender: types.Message, state: FSMContext):
+async def add_channel(sender: types.Message, state: FSMContext, is_admin: bool):
+    if not is_admin:
+        await sender.answer("К сожалению, у вас нет прав, чтобы добавить канал!")
+        return
+
     await sender.answer("Введите название канала (@channel_name) или ID канала",
                         reply_markup=types.ReplyKeyboardRemove())
     await state.set_state(ChannelState.channel)
@@ -57,7 +66,8 @@ async def process_channel_name(message: types.Message, state: FSMContext):
             else:
                 await ChannelRepository.create_channel(chat.id, message.from_user.id, chat.title)
                 await message.answer(
-                    f"Вы добавили канал: {chat.title}, ID: <code>{chat.id}</code>",
+                    f"Вы добавили канал: {chat.title}, ID: <code>{chat.id}</code>\n"
+                    f"Добавьте бота в этот канал и дайте права администратора, чтобы он мог отправлять результаты аналитики.",
                     reply_markup=ReplyKeyboardMarkup(
                         keyboard=[
                             [

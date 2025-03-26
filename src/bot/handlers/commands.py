@@ -2,7 +2,6 @@ from aiogram import Router, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-from src.database.models import Role
 from src.database.repositories import UserRepository
 
 router = Router()
@@ -21,7 +20,9 @@ async def start_command(sender: types.Message):
         reply_markup=ReplyKeyboardMarkup(
             keyboard=[
                 [
-                    KeyboardButton(text="Войти в админку"),
+                    KeyboardButton(text="Каналы"),
+                    KeyboardButton(text="Добавить канал"),
+                    KeyboardButton(text="Начать анализировать поток"),
                 ]
             ],
             resize_keyboard=True,
@@ -29,26 +30,10 @@ async def start_command(sender: types.Message):
     )
 
 
-@router.message(F.text == "Войти в админку")
 @router.message(Command("admin"))
-async def admin_command(sender: types.Message):
-    telegram_id = sender.from_user.id
-    user = await UserRepository.get_user(telegram_id=telegram_id)
-
-    if user.role == Role.ADMIN:
-        await sender.answer(
-            "Вы успешно вошли в админку!",
-            reply_markup=ReplyKeyboardMarkup(
-                keyboard=[
-                    [
-                        KeyboardButton(text="Каналы"),
-                        KeyboardButton(text="Добавить канал"),
-                        KeyboardButton(text="Начать анализировать поток"),
-                    ]
-                ],
-                resize_keyboard=True,
-            )
-        )
+async def admin_command(sender: types.Message, is_admin: bool):
+    if is_admin:
+        await sender.answer("У вас есть права администратора!",)
     else:
         await sender.answer("К сожалению, у вас нет прав администратора. Нажмите на /help, чтобы узнать подробности")
 

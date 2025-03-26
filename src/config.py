@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     EMAIL_MODEL: str
     PASSWORD_MODEL: str
 
-    URL_REQUEST: str
+    REQUEST_URL: str
 
     class Config:
         env_file = ".env"

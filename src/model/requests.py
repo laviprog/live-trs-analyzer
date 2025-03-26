@@ -63,7 +63,8 @@ async def chat_completions(model, content, role="user"):
         "messages": [
             {
                 "role": role,
-                "content": content
+                "content": content,
+                "keep-alive": 30,
             }
         ]
     }

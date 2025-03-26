@@ -4,7 +4,7 @@ from pydub import AudioSegment
 from pydub.silence import detect_nonsilent
 
 
-async def split_audio_by_silence(self, audio_bytes, silence_thresh=-40, min_silence_len=600, bytes_format="mp3"):
+def split_audio_by_silence(audio_bytes, silence_thresh=-40, min_silence_len=600, bytes_format="mp3"):
     try:
         audio = AudioSegment.from_file(io.BytesIO(audio_bytes), format=bytes_format)
     except Exception as e:
