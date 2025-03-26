@@ -36,7 +36,7 @@ class Listener(threading.Thread):
         self.total_subtitles_symbols = 0
         self.total_time = timedelta(seconds=0)
         self.max_subtitles_symbols_window = 3000  # mb selectable value
-        self.max_subtitles_symbols = 2000  # mb selectable value, < 000
+        self.max_subtitles_symbols = 8000  # mb selectable value, < 000
         self.max_time_before = timedelta(seconds=5 * 60)  # 5 min
         self.max_time = timedelta(seconds=15 * 60)  # 15 min
 
@@ -191,7 +191,7 @@ class Listener(threading.Thread):
 
         for keyword in self.keywords:
             for subtitle in subtitles:
-                if keyword in subtitle.content:
+                if keyword in subtitle.content.lower():
                     words.add(keyword)
 
         return list(words)
