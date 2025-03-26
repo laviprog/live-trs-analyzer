@@ -1,0 +1,26 @@
+services:
+  live-trs-analyzer:
+    build:
+      context: .
+    container_name: live-trs-analyzer
+    image: live-trs-analyzer
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      - redis-trs
+    networks:
+      - live-trs-network
+
+  redis-trs:
+    image: redis:7.4.2
+    container_name: redis-trs
+    restart: always
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - live-trs-network
+
+networks:
+  live-trs-network:
