@@ -26,8 +26,6 @@ def get_subtitles_from_segments(segments, start_time: datetime.datetime) -> tupl
         )
 
     quantity_symbols = get_quantity_symbols(subtitles)
-    # TODO check if it's correct
-    print(f'quantity_symbols: {quantity_symbols}')
 
     return subtitles, quantity_symbols
 

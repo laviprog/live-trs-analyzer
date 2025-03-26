@@ -177,12 +177,6 @@ class Listener(threading.Thread):
                             logger.info(f"Processing time model (seconds): {(end_time_model_processing - start_time_model_processing).seconds}")
                             logger.info(f"Result: {result}")
 
-                            # # TODO change to correct
-                            # start_time, end_time = result.split(";")
-
-                            # # TODO change filepath
-                            # file = await get_video_from_flow(start_time, end_time, 'video.mp4')
-
                             asyncio.run_coroutine_threadsafe(send(f"Result analysis: {result}"), self.loop)
 
                 self.remaining = last_chunk or b""

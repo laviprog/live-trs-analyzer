@@ -12,5 +12,3 @@ async def send(message):
 
     for channel in channels:
         await bot.send_message(channel.channel_id, message)
-
-# TODO send video
