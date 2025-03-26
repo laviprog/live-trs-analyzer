@@ -171,15 +171,21 @@ class Listener(threading.Thread):
                                 break
 
                             start_time_model_processing = datetime.now()
-                            result = asyncio.run_coroutine_threadsafe(chat_completions(self.analyzer_model, prompt + str_subtitles), self.loop).result()
+                            result = asyncio.run_coroutine_threadsafe(chat_completions(self.analyzer_model, prompt + str_subtitles), self.loop).result(timeout=20)
                             end_time_model_processing = datetime.now()
+
+                            if self._stop_event.is_set():
+                                break
 
                             logger.info(f"Processing time model (seconds): {(end_time_model_processing - start_time_model_processing).seconds}")
                             logger.info(f"Result: {result}")
 
-                            asyncio.run_coroutine_threadsafe(send(f"Result analysis: {result}"), self.loop)
+                            asyncio.run_coroutine_threadsafe(send(f"Result analysis: {result}"), self.loop).result(timeout=10)
 
                 self.remaining = last_chunk or b""
+
+                if self._stop_event.is_set():
+                    break
 
         finally:
             logger.info("Terminating ffmpeg process...")
