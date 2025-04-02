@@ -1,6 +1,7 @@
 import asyncio
 import copy
 import io
+import json
 import subprocess
 import threading
 
@@ -159,19 +160,17 @@ class Listener(threading.Thread):
                             logger.info(f"srt_subtitles: {str_subtitles}")
 
                             prompt = (
-                                "Analyze the subtitles of a news channel and answer the following questions:\n"
-                                f"1. Identify the time range in which the segment about '{word}' appears. Provide the answer in the format HH:MM:SS – HH:MM:SS.\n"
-                                "2. Based on the identified segment, determine its tone and briefly summarize its key points in a few sentences.\n\n"
-                                "Subtitles:\n"
+                                f"Keyword: {word}."
+                                f"Subtitles:\n{str_subtitles}"
                             )
 
-                            logger.info(f"Send to model request: {prompt + str_subtitles}")
+                            logger.info(f"Send to model request: {prompt}")
 
                             if self._stop_event.is_set():
                                 break
 
                             start_time_model_processing = datetime.now()
-                            result = asyncio.run_coroutine_threadsafe(chat_completions(self.analyzer_model, prompt + str_subtitles), self.loop).result(timeout=20)
+                            result = asyncio.run_coroutine_threadsafe(chat_completions(self.analyzer_model, prompt), self.loop).result(timeout=20)
                             end_time_model_processing = datetime.now()
 
                             if self._stop_event.is_set():
@@ -180,7 +179,15 @@ class Listener(threading.Thread):
                             logger.info(f"Processing time model (seconds): {(end_time_model_processing - start_time_model_processing).seconds}")
                             logger.info(f"Result: {result}")
 
-                            asyncio.run_coroutine_threadsafe(send(f"Result analysis: {result}"), self.loop).result(timeout=10)
+                            result = json.loads(result)
+                            '''
+                            {
+                              "time_range": "HH:MM:SS – HH:MM:SS",
+                              "tone": "tone",
+                              "summary": "summary"
+                            }
+                            '''
+                            asyncio.run_coroutine_threadsafe(send(result, word), self.loop).result(timeout=10)
 
                 self.remaining = last_chunk or b""
 

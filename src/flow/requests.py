@@ -4,11 +4,14 @@ from src.flow import REQUEST_URL
 
 
 async def get_video_from_flow(start_time: int, end_time: int, save_path: str):
+    dur = end_time - start_time
     ENDPOINT = REQUEST_URL + f'?start_time={start_time}&end_time={end_time}'
+    # /archive-1742888022-30359.ts?token=media$c0p
 
     headers = {
         'Content-Type': 'multipart/form-data'
     }
+
 
     async with aiohttp.ClientSession() as session:
         async with session.get(ENDPOINT, headers=headers) as response:
