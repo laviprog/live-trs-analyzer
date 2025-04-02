@@ -12,6 +12,13 @@ services:
       - redis-trs
     networks:
       - live-trs-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
 
   redis-trs:
     image: redis:7.4.2
