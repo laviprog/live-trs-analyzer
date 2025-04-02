@@ -1,13 +1,13 @@
-FROM python:3.10-slim
+FROM nvidia/cuda:12.2.2-cudnn-runtime-ubuntu22.04
 
-RUN apt update && apt install ffmpeg -y
+RUN apt update && apt install -y python3 python3-pip ffmpeg
 
 WORKDIR /app
 
 COPY requirements.txt .
 
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "main.py"]
+CMD ["python3", "main.py"]
