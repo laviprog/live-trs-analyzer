@@ -1,3 +1,4 @@
+import os
 import subprocess
 from datetime import timezone, datetime
 from aiogram.types import FSInputFile
@@ -46,3 +47,9 @@ async def send(result: dict[str, str], keyword: str):
             caption=message,
             video=video
         )
+
+    if os.path.exists(video_path):
+        os.remove(video_path)
+
+    if os.path.exists(new_video_path):
+        os.remove(new_video_path)
