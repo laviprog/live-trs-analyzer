@@ -54,7 +54,7 @@ async def process_language(message: types.Message, state: FSMContext):
 
 @router.message(StartState.keywords)
 async def process_key_words(message: types.Message, state: FSMContext):
-    keywords = message.text.strip().split(',')
+    keywords = [keyword.strip() for keyword in message.text.strip().split(',')]
     await state.update_data(keywords=keywords)
 
     await message.answer(
@@ -112,7 +112,7 @@ async def end_trs(sender: types.Message):
 
     global listener
     listener.stop()
-    listener.join()
+    listener.join(timeout=10)
     listener = None
 
     await sender.answer(
