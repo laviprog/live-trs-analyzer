@@ -112,7 +112,7 @@ async def end_trs(sender: types.Message):
 
     global listener
     listener.stop()
-    listener.join()
+    listener.join(timeout=10)
     listener = None
 
     await sender.answer(

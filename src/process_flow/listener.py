@@ -61,7 +61,7 @@ class Listener(threading.Thread):
             ["ffmpeg", "-i", self.flow, "-ac", "1", "-ar", str(self.sample_rate), "-f", self.flow_format, "pipe:1"],
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL,
-            bufsize=10 ** 8
+            bufsize=10 ** 9
         )
 
         try:
@@ -196,8 +196,13 @@ class Listener(threading.Thread):
 
         finally:
             logger.info("Terminating ffmpeg process...")
-            process.terminate()
-            process.wait()
+            if process.poll() is not None:
+                process.terminate()
+                try:
+                    process.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    process.kill()
+                    logger.info("Process timed out.")
 
     def _check_key_words(self, subtitles: list[Subtitle]):
         words = set()
