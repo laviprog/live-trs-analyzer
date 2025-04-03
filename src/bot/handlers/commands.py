@@ -21,10 +21,13 @@ async def start_command(sender: types.Message):
     await sender.answer(
         f"Hello, your telegram_id: <code>{telegram_id}</code>!",
         reply_markup=ReplyKeyboardMarkup(
-            keyboard=[
+            keyboard=
+            [
                 [
                     KeyboardButton(text="Каналы"),
-                    KeyboardButton(text="Добавить канал"),
+                    KeyboardButton(text="Добавить канал")
+                ],
+                [
                     KeyboardButton(text="Начать анализировать поток"),
                     KeyboardButton(text="Добавить админа")
                 ]
@@ -37,7 +40,7 @@ async def start_command(sender: types.Message):
 @router.message(Command("admin"))
 async def admin_command(sender: types.Message, is_admin: bool):
     if is_admin:
-        await sender.answer("У вас есть права администратора!",)
+        await sender.answer("У вас есть права администратора!", )
     else:
         await sender.answer("К сожалению, у вас нет прав администратора. Нажмите на /help, чтобы узнать подробности")
 

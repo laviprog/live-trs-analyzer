@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove, ReplyKeyboardMarkup, KeyboardButton
 
+from src.database import Role
 from src.database.repositories import UserRepository
 
 router = Router()
@@ -35,15 +36,18 @@ async def username_process(mes: Message, state: FSMContext):
 
     user = await UserRepository.get_user(username=username)
     if user is None:
-        user = await UserRepository.create_user(username=username)
+        user = await UserRepository.create_user(username=username, role=Role.ADMIN)
     else:
         user = await UserRepository.update_user_role(user)
 
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[
+        keyboard=
+        [
             [
                 KeyboardButton(text="Каналы"),
-                KeyboardButton(text="Добавить канал"),
+                KeyboardButton(text="Добавить канал")
+            ],
+            [
                 KeyboardButton(text="Начать анализировать поток"),
                 KeyboardButton(text="Добавить админа")
             ]

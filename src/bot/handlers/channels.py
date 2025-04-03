@@ -52,11 +52,15 @@ async def process_channel_name(message: types.Message, state: FSMContext):
                 await message.answer(
                     "Этот канал уже добавлен.",
                     reply_markup=ReplyKeyboardMarkup(
-                        keyboard=[
+                        keyboard=
+                        [
                             [
                                 KeyboardButton(text="Каналы"),
-                                KeyboardButton(text="Добавить канал"),
+                                KeyboardButton(text="Добавить канал")
+                            ],
+                            [
                                 KeyboardButton(text="Начать анализировать поток"),
+                                KeyboardButton(text="Добавить админа")
                             ]
                         ],
                         resize_keyboard=True,
@@ -69,11 +73,15 @@ async def process_channel_name(message: types.Message, state: FSMContext):
                     f"Вы добавили канал: {chat.title}, ID: <code>{chat.id}</code>\n"
                     f"Добавьте бота в этот канал и дайте права администратора, чтобы он мог отправлять результаты аналитики.",
                     reply_markup=ReplyKeyboardMarkup(
-                        keyboard=[
+                        keyboard=
+                        [
                             [
                                 KeyboardButton(text="Каналы"),
-                                KeyboardButton(text="Добавить канал"),
+                                KeyboardButton(text="Добавить канал")
+                            ],
+                            [
                                 KeyboardButton(text="Начать анализировать поток"),
+                                KeyboardButton(text="Добавить админа")
                             ]
                         ],
                         resize_keyboard=True,
