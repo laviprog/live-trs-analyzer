@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     PASSWORD_MODEL: str
 
     REQUEST_URL: str
+    TOKEN: str
 
     class Config:
         env_file = ".env"

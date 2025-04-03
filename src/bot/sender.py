@@ -1,6 +1,6 @@
+import subprocess
 from datetime import timezone, datetime
-
-from aiogram.types import BufferedInputFile
+from aiogram.types import FSInputFile
 
 from src.database.repositories import ChannelRepository
 from src.flow.requests import get_video_from_flow
@@ -18,7 +18,17 @@ async def send(result: dict[str, str], keyword: str):
 
     start_time, end_time = map(to_seconds, result['time_range'].split('–'))
 
-    # video = await get_video_from_flow(start_time, end_time, f"{start_time}-{end_time}.mp4")
+    video_path = await get_video_from_flow(start_time, end_time)
+    new_video_path = ".".join(video_path.split('.')[:-1] + ['mp4'])
+
+    command = [
+        "ffmpeg",
+        "-i", video_path,
+        "-c:v", "libx264",
+        "-c:a", "aac",
+        new_video_path
+    ]
+    subprocess.run(command)
 
     message = (f"#{keyword}\n\n"
                f"{result['summary']}\n\n"
@@ -27,14 +37,12 @@ async def send(result: dict[str, str], keyword: str):
     channels = await ChannelRepository.get_channels()
     logger.info(channels)
 
-    for channel in channels:
-        await bot.send_message(channel, message)
+    video = FSInputFile(path=new_video_path, filename=new_video_path.split('/')[-1])
 
-    # with open(video, 'rb') as v:
-    #     video_data = v.read()
-    #     for channel in channels:
-    #         await bot.send_video(
-    #             chat_id=channel.channel_id,
-    #             caption=message,
-    #             video=BufferedInputFile(video_data, filename=video)
-    #         )
+    for channel in channels:
+        logger.info(f"Send video to channel: {channel.title}. Message: {message}")
+        await bot.send_video(
+            chat_id=channel.channel_id,
+            caption=message,
+            video=video
+        )
