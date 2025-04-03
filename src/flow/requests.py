@@ -8,7 +8,7 @@ from src.flow import REQUEST_URL
 async def get_video_from_flow(start_time: int, end_time: int) -> str:
     dur = end_time - start_time
     ENDPOINT = REQUEST_URL + f'/archive-{start_time}-{end_time - start_time}.ts?token={settings.TOKEN}'
-    save_path = f"{start_time}-{dur}.ts"
+    save_path = f"data/video/{start_time}-{dur}.ts"
 
     async with aiohttp.ClientSession() as session:
         async with session.get(ENDPOINT) as response:
