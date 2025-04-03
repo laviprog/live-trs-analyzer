@@ -17,6 +17,21 @@ async def send(result: dict[str, str], keyword: str):
         times = s.split(':')
         return int(times[0]) * 3600 + int(times[1]) * 60 + int(times[2]) + seconds_since_epoch
 
+    channels = await ChannelRepository.get_channels()
+    logger.info(channels)
+
+    if 'time_range' not in result:
+        message = (f"#{keyword}\n\n"
+                   f"{result['result']}")
+
+        for channel in channels:
+            logger.info(f"Send video to channel: {channel.title}. Message: {message}")
+            await bot.send_message(
+                chat_id=channel.channel_id,
+                text=message
+            )
+        return
+
     start_time, end_time = map(to_seconds, result['time_range'].split('–'))
 
     video_path = await get_video_from_flow(start_time, end_time)
@@ -34,9 +49,6 @@ async def send(result: dict[str, str], keyword: str):
     message = (f"#{keyword}\n\n"
                f"{result['summary']}\n\n"
                f"Tone: {result['tone']}")
-
-    channels = await ChannelRepository.get_channels()
-    logger.info(channels)
 
     video = FSInputFile(path=new_video_path, filename=new_video_path.split('/')[-1])
 

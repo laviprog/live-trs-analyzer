@@ -12,7 +12,10 @@ async def start_command(sender: types.Message):
     telegram_id = sender.from_user.id
     username = sender.from_user.username
 
-    if not await UserRepository.get_user(telegram_id=telegram_id):
+    if user := await UserRepository.get_user(username=username):
+        if user.telegram_id is None:
+            await UserRepository.update_user_telegram_id(user, telegram_id)
+    else:
         await UserRepository.create_user(username=username, telegram_id=telegram_id)
 
     await sender.answer(
@@ -23,6 +26,7 @@ async def start_command(sender: types.Message):
                     KeyboardButton(text="Каналы"),
                     KeyboardButton(text="Добавить канал"),
                     KeyboardButton(text="Начать анализировать поток"),
+                    KeyboardButton(text="Добавить админа")
                 ]
             ],
             resize_keyboard=True,

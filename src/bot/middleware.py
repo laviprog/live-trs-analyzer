@@ -13,6 +13,6 @@ class AuthMiddleware(BaseMiddleware):
             event: Update,
             data: Dict[str, Any]
     ) -> Any:
-        user = await UserRepository.get_user(telegram_id=event.message.from_user.id)
+        user = await UserRepository.get_user(username=event.message.from_user.username)
         data['is_admin'] = user is not None and user.role == Role.ADMIN
         return await handler(event, data)

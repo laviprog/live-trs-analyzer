@@ -17,7 +17,7 @@ class User(Model):
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    telegram_id: Mapped[int]
+    telegram_id: Mapped[int | None]
     username: Mapped[str]
     role: Mapped[Role] = mapped_column(String)
 

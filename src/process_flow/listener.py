@@ -178,8 +178,10 @@ class Listener(threading.Thread):
 
                             logger.info(f"Processing time model (seconds): {(end_time_model_processing - start_time_model_processing).seconds}")
                             logger.info(f"Result: {result}")
-
-                            result = json.loads(result)
+                            try:
+                                result = json.loads(result)
+                            except json.decoder.JSONDecodeError:
+                                result = {"result": result}
                             '''
                             {
                               "time_range": "HH:MM:SS – HH:MM:SS",
