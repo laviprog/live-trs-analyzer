@@ -35,7 +35,8 @@ async def process_flow(message: types.Message, state: FSMContext):
     flow = message.text.strip()
     await state.update_data(flow=flow)
 
-    await message.answer('Введите язык (en, ru, kk) или поставьте прочерк "-" (будет использован язык по умолчанию – en):')
+    await message.answer(
+        'Введите язык (en, ru, kk) или поставьте прочерк "-" (будет использован язык по умолчанию – en):')
     await state.set_state(StartState.language)
 
 
@@ -65,7 +66,6 @@ async def process_key_words(message: types.Message, state: FSMContext):
         )
     )
     await state.set_state(StartState.model)
-
 
 
 @router.message(StartState.model)
@@ -118,11 +118,15 @@ async def end_trs(sender: types.Message):
     await sender.answer(
         "Анализ завершен!",
         reply_markup=ReplyKeyboardMarkup(
-            keyboard=[
+            keyboard=
+            [
                 [
                     KeyboardButton(text="Каналы"),
-                    KeyboardButton(text="Добавить канал"),
+                    KeyboardButton(text="Добавить канал")
+                ],
+                [
                     KeyboardButton(text="Начать анализировать поток"),
+                    KeyboardButton(text="Добавить админа")
                 ]
             ],
             resize_keyboard=True,
