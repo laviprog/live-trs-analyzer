@@ -7,6 +7,9 @@ class Settings(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: int
 
+    ADMIN_TELEGRAM_ID: int
+    ADMIN_USERNAME: str
+
     MODEL: str
     DEVICE: str
     COMPUTE_TYPE: str

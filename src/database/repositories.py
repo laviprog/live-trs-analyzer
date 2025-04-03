@@ -9,7 +9,7 @@ class UserRepository:
     async def create_user(
             cls,
             username: str,
-            telegram_id: int,
+            telegram_id: int = None,
             role: Role = Role.USER
     ) -> User | None:
 
@@ -51,6 +51,23 @@ class UserRepository:
                 select(User)
             )
             return list(result.scalars().all())
+
+
+    @classmethod
+    async def update_user_role(cls, user: User, role: Role = Role.ADMIN) -> User | None:
+        async with new_session() as session:
+            user.role = role
+            session.add(user)
+            await session.commit()
+            return user
+
+    @classmethod
+    async def update_user_telegram_id(cls, user: User, telegram_id: int) -> User | None:
+        async with new_session() as session:
+            user.telegram_id = telegram_id
+            session.add(user)
+            await session.commit()
+            return user
 
 
 class ChannelRepository:
