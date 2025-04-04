@@ -108,6 +108,8 @@ class Listener(threading.Thread):
                     logger.info(f"Send to transcribe")
 
                     segments = transcribe_audio(main_audio, language=self.language)
+                    if not segments:
+                        continue
                     subtitles, quantity_symbols = get_subtitles_from_segments(segments, self.time)
 
                     self.total_subtitles_symbols += quantity_symbols
@@ -197,8 +199,8 @@ class Listener(threading.Thread):
                     break
 
         finally:
-            logger.info("Terminating ffmpeg process...")
             if process.poll() is not None:
+                logger.info("Terminating ffmpeg process...")
                 process.terminate()
                 try:
                     process.wait(timeout=10)
